@@ -6,10 +6,127 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum TipStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+
+  notes         Note[]         @relation("UserNotes")
+  posts         Announcement[] @relation("UserPosts")
+  tips          Tip[]          @relation("UserTips")
+  files         File[]         @relation("UserFiles")
+  feedbacks     Feedback[]     @relation("UserFeedbacks")
+  approvedTips  Tip[]          @relation("TipApprovedBy")
+  approvedNotes Note[]         @relation("NoteApprovedBy")
+}
+
+model Subject {
+  id       String @id @default(uuid())
+  name     String @unique
+  branch   String
+  semester Int
+  notes    Note[]
+}
+
+model Note {
+  id       String @id @default(uuid())
+  title    String
+  branch   String
+  semester Int
+  fileUrl  String
+
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  subjectId String
+
+  uploadedBy   User   @relation("UserNotes", fields: [uploadedById], references: [id])
+  uploadedById String
+
+  approvedBy   User?   @relation("NoteApprovedBy", fields: [approvedById], references: [id])
+  approvedById String?
+
+  createdAt DateTime   @default(now())
+  feedbacks Feedback[]
+}
+
+model Tip {
+  id        String    @id @default(uuid())
+  title     String
+  content   String
+  status    TipStatus @default(PENDING)
+  createdAt DateTime  @default(now())
+
+  postedBy   User?   @relation("UserTips", fields: [postedById], references: [id])
+  postedById String?
+
+  approvedBy   User?   @relation("TipApprovedBy", fields: [approvedById], references: [id])
+  approvedById String?
+
+  feedbacks Feedback[]
+}
+
+model File {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  type     String
+  size     Int
+
+  uploadedBy   User   @relation("UserFiles", fields: [uploadedById], references: [id])
+  uploadedById String
+
+  createdAt DateTime @default(now())
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  user   User   @relation("UserFeedbacks", fields: [userId], references: [id])
+  userId String
+
+  note   Note?   @relation(fields: [noteId], references: [id])
+  noteId String?
+
+  tip   Tip?    @relation(fields: [tipId], references: [id])
+  tipId String?
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  createdAt DateTime @default(now())
+
+  postedBy   User   @relation("UserPosts", fields: [postedById], references: [id])
+  postedById String
+}
+
+model Event {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  eventDate DateTime
+  createdAt DateTime @default(now())
 }
