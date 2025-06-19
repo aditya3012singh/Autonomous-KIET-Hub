@@ -122,7 +122,7 @@ router.get("/note/:id", async (req,res)=>{
     }
 })
 
-router.put("note/approve/;id", authMiddleware, isAdmin, async(req,res)=>{
+router.put("note/approve/:id", authMiddleware, isAdmin, async(req,res)=>{
     try{
         const noteId=req.params.id
 
