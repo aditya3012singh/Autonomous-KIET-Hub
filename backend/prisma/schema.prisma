@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,32 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  STUDENT
-}
-
-enum TipStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(STUDENT)
-  createdAt DateTime @default(now())
-
-  notes         Note[]         @relation("UserNotes")
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  password      String
+  role          Role           @default(STUDENT)
+  createdAt     DateTime       @default(now())
   posts         Announcement[] @relation("UserPosts")
-  tips          Tip[]          @relation("UserTips")
-  files         File[]         @relation("UserFiles")
   feedbacks     Feedback[]     @relation("UserFeedbacks")
-  approvedTips  Tip[]          @relation("TipApprovedBy")
+  files         File[]         @relation("UserFiles")
   approvedNotes Note[]         @relation("NoteApprovedBy")
+  notes         Note[]         @relation("UserNotes")
+  approvedTips  Tip[]          @relation("TipApprovedBy")
+  tips          Tip[]          @relation("UserTips")
 }
 
 model Subject {
@@ -50,77 +32,64 @@ model Subject {
 }
 
 model Note {
-  id       String @id @default(uuid())
-  title    String
-  branch   String
-  semester Int
-  fileUrl  String
-
-  subject   Subject @relation(fields: [subjectId], references: [id])
-  subjectId String
-
-  uploadedBy   User   @relation("UserNotes", fields: [uploadedById], references: [id])
+  id           String     @id @default(uuid())
+  title        String
+  branch       String
+  semester     Int
+  fileUrl      String
+  subjectId    String
   uploadedById String
-
-  approvedBy   User?   @relation("NoteApprovedBy", fields: [approvedById], references: [id])
   approvedById String?
-
-  createdAt DateTime   @default(now())
-  feedbacks Feedback[]
+  createdAt    DateTime   @default(now())
+  feedbacks    Feedback[]
+  approvedBy   User?      @relation("NoteApprovedBy", fields: [approvedById], references: [id])
+  subject      Subject    @relation(fields: [subjectId], references: [id])
+  uploadedBy   User       @relation("UserNotes", fields: [uploadedById], references: [id])
 }
 
 model Tip {
-  id        String    @id @default(uuid())
-  title     String
-  content   String
-  status    TipStatus @default(PENDING)
-  createdAt DateTime  @default(now())
-
-  postedBy   User?   @relation("UserTips", fields: [postedById], references: [id])
-  postedById String?
-
-  approvedBy   User?   @relation("TipApprovedBy", fields: [approvedById], references: [id])
+  id           String     @id @default(uuid())
+  title        String
+  content      String
+  status       TipStatus  @default(PENDING)
+  createdAt    DateTime   @default(now())
+  postedById   String?
   approvedById String?
-
-  feedbacks Feedback[]
+  feedbacks    Feedback[]
+  approvedBy   User?      @relation("TipApprovedBy", fields: [approvedById], references: [id])
+  postedBy     User?      @relation("UserTips", fields: [postedById], references: [id])
 }
 
 model File {
-  id       String @id @default(uuid())
-  url      String
-  filename String
-  type     String
-  size     Int
-
-  uploadedBy   User   @relation("UserFiles", fields: [uploadedById], references: [id])
+  id           String   @id @default(uuid())
+  url          String
+  filename     String
+  type         String
+  size         Int
   uploadedById String
-
-  createdAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+  uploadedBy   User     @relation("UserFiles", fields: [uploadedById], references: [id])
 }
 
 model Feedback {
   id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
-
-  user   User   @relation("UserFeedbacks", fields: [userId], references: [id])
-  userId String
-
-  note   Note?   @relation(fields: [noteId], references: [id])
-  noteId String?
-
-  tip   Tip?    @relation(fields: [tipId], references: [id])
-  tipId String?
+  userId    String
+  noteId    String?
+  tipId     String?
+  note      Note?    @relation(fields: [noteId], references: [id])
+  tip       Tip?     @relation(fields: [tipId], references: [id])
+  user      User     @relation("UserFeedbacks", fields: [userId], references: [id])
 }
 
 model Announcement {
-  id        String   @id @default(uuid())
-  title     String
-  message   String
-  createdAt DateTime @default(now())
-
-  postedBy   User   @relation("UserPosts", fields: [postedById], references: [id])
+  id         String   @id @default(uuid())
+  title      String
+  message    String
+  createdAt  DateTime @default(now())
   postedById String
+  postedBy   User     @relation("UserPosts", fields: [postedById], references: [id])
 }
 
 model Event {
@@ -129,4 +98,15 @@ model Event {
   content   String
   eventDate DateTime
   createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum TipStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

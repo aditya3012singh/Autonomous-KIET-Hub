@@ -7,6 +7,7 @@ import nodemailer from "nodemailer";
 import { PrismaClient } from '@prisma/client';
 import Redis from "ioredis";
 import { loginSchema, signupSchema } from "../validators/ValidateUser.js";
+import { error } from "console";
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ const redis = new Redis();
 
 // ✅ Nodemailer setup
 const transporter = nodemailer.createTransport({
-  service: "Gmail",
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -25,13 +26,16 @@ const transporter = nodemailer.createTransport({
 
 // ✅ Route to generate OTP
 router.post("/generate-otp", async (req, res) => {
+  console.log("hello from otp")
   const { email } = req.body;
   const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-
+  console.log(otpCode)
   try {
+    console.log(process.env.EMAIL_USER)
+    console.log(process.env.EMAIL_PASS)
     // Store OTP in Redis with 10-minute TTL
     await redis.set(`otp:${email}`, otpCode, "EX", 600);
-
+    console.log("Ram")
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -42,6 +46,7 @@ router.post("/generate-otp", async (req, res) => {
     console.log("OTP sent to:", email);
     res.json({ message: "OTP sent to email!" });
   } catch (error) {
+    console.log("hello")
     console.error("OTP error:", error);
     res.status(500).json({ message: "Failed to send OTP" });
   }
@@ -69,6 +74,7 @@ router.post("/verify-otp", async (req, res) => {
 
 // ✅ Signup route (with OTP check)
 router.post("/signup", async (req, res) => {
+  console.log("hello")
   try {
     const parsed = signupSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -98,9 +104,10 @@ router.post("/signup", async (req, res) => {
       },
     });
 
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET || "secret",
+    const token = jwt.sign({ 
+        id: user.id, 
+        role: user.role },
+        process.env.JWT_SECRET || "secret",
       { expiresIn: "1h" }
     );
 
@@ -116,6 +123,7 @@ router.post("/signup", async (req, res) => {
       },
     });
   } catch (e) {
+    console.log(error)
     console.error(e);
     res.status(500).json({ message: "Internal server error" });
   }

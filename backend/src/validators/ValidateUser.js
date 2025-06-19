@@ -4,8 +4,7 @@ export const signupSchema = z.object({
   email: z.string().email(),
   name: z.string().min(5, "Name must be at least 5 characters!!"),
   password: z.string().min(6, "Password must be at least 6 characters!!"),
-  role: z.enum(["ADMIN", "CUSTOMER"]).default("CUSTOMER"),
-  otp: z.string().length(6, "OTP must be exactly 6 digits")
+  role: z.enum(["ADMIN", "CUSTOMER"]).default("CUSTOMER")
 });
 
 
@@ -42,8 +41,8 @@ export const feedbackSchema = z.object({
 
 // by admin
 export const subjectSchema = z.object({
-  name: z.string().min(3),
-  branch: z.string().min(2),
+  name: z.string().min(1),
+  branch: z.string().min(1),
   semester: z.number().min(1).max(8)
 });
 
