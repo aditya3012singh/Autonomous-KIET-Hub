@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client"
 import express from "express"
-import { authMiddleware } from "../middlewares/authMiddleware"
-import { isAdmin } from "../middlewares/isAdmin"
-import { s3Upload } from "../middlewares/s3upload"
+import { authMiddleware } from "../middlewares/authMiddleware.js"
+import { isAdmin } from "../middlewares/isAdmin.js"
+import { s3Upload } from "../middlewares/s3upload.js"
  
 
 const prisma = new PrismaClient()

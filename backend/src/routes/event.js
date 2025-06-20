@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client"
 import express from "express"
-import { authMiddleware } from "../middlewares/authMiddleware"
-import { isAdmin } from "../middlewares/isAdmin"
-import { eventSchema } from "../validators/ValidateUser"
+import { authMiddleware } from "../middlewares/authMiddleware.js"
+import { isAdmin } from "../middlewares/isAdmin.js"
+import { eventSchema } from "../validators/ValidateUser.js"
 
 
 const prisma = new PrismaClient()

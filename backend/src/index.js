@@ -5,10 +5,10 @@ import cors from "cors";
 import userRouter from "./routes/user.js";
 import subjectRouter from "./routes/subject.js";
 import notesRouter from "./routes/notes.js";
-import tipRouter from "./routes/tips.js";
+import tipRouter from "./routes/tip.js";
 import feedbackRouter from "./routes/feedback.js";
-import eventRouter from "./routes/events.js";
-import announcementRouter from "./routes/announcements.js";
+import eventRouter from "./routes/event.js";
+import announcementRouter from "./routes/announcement.js";
 
 dotenv.config();
 

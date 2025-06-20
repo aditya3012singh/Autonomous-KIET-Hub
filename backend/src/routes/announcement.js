@@ -1,8 +1,8 @@
 import express from "express"
 import { PrismaClient } from "@prisma/client"
-import { authMiddleware } from "../middlewares/authMiddleware"
-import { isAdmin } from "../middlewares/isAdmin"
-import { announcementSchema } from "../validators/ValidateUser"
+import { authMiddleware } from "../middlewares/authMiddleware.js"
+import { isAdmin } from "../middlewares/isAdmin.js"
+import { announcementSchema } from "../validators/ValidateUser.js"
 
 const prisma= new PrismaClient()
 const router= express.Router()

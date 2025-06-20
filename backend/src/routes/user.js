@@ -8,6 +8,8 @@ import { PrismaClient } from '@prisma/client';
 import Redis from "ioredis";
 import { loginSchema, signupSchema } from "../validators/ValidateUser.js";
 import { error } from "console";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
+import { isAdmin } from "../middlewares/isAdmin.js";
 
 dotenv.config();
 
