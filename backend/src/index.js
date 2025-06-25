@@ -9,7 +9,7 @@ import tipRouter from "./routes/tip.js";
 import feedbackRouter from "./routes/feedback.js";
 import eventRouter from "./routes/event.js";
 import announcementRouter from "./routes/announcement.js";
-
+import overviewRoutes from './routes/overview.js'
 dotenv.config();
 
 const app = express();
@@ -21,7 +21,7 @@ app.use(cors());
 app.get("/", (req, res) => {
   res.send("API running!");
 });
-
+app.use('/api/overview', overviewRoutes);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/subjects", subjectRouter);
 app.use("/api/v1/notes", notesRouter);

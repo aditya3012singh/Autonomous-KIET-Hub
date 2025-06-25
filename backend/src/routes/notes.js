@@ -9,34 +9,71 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // POST /note/upload → Upload a note (protected)
-router.post("/note/upload", authMiddleware, async (req, res) => {
+// router.post("/note/upload", authMiddleware, async (req, res) => {
+//   try {
+//     const parsed = uploadNoteSchema.safeParse(req.body);
+//     if (!parsed.success) {
+//       return res.status(403).json({ errors: parsed.error.errors });
+//     }
+
+//     let { title, branch, semester, subjectId, fileUrl } = parsed.data;
+//     const userId = req.user.id;
+
+//     // Support both string and array for branch
+//     if (typeof branch === 'string') {
+//       branch = [branch];
+//     }
+
+//     // Check if subject exists
+//     const subject = await prisma.subject.findUnique({
+//       where: { id: subjectId },
+//     });
+
+//     if (!subject) {
+//       return res.status(404).json({ error: "Subject not found." });
+//     }
+
+//     const createdNotes = [];
+
+//     for (const b of branch) {
+//       const note = await prisma.note.create({
+//         data: {
+//           title,
+//           branch: b,
+//           semester,
+//           fileUrl,
+//           subjectId,
+//           uploadedById: userId,
+//         },
+//       });
+//       createdNotes.push(note);
+//     }
+
+//     return res.status(201).json({
+//       message: "Notes uploaded to multiple branches successfully",
+//       notes: createdNotes,
+//     });
+//   } catch (err) {
+//     console.error("Upload error:", err);
+//     return res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
+router.post("/note/upload", authMiddleware, s3Upload.single("file"), async (req, res) => {
   try {
-    const parsed = uploadNoteSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(403).json({ errors: parsed.error.errors });
+    const { title, branch, semester, subjectId } = req.body;
+
+    if (!title || !branch || !semester || !subjectId || !req.file || !req.file.location) {
+      return res.status(400).json({ message: "Missing required fields or file" });
     }
 
-    const { title, branch, semester, subjectId, fileUrl } = parsed.data;
-    const userId = req.user.id;
-
-    // Check if subject exists
-    const subject = await prisma.subject.findUnique({
-      where: { id: subjectId },
-    });
-
-    if (!subject) {
-      return res.status(404).json({ error: "Subject not found." });
-    }
-
-    // Upload the note
     const note = await prisma.note.create({
       data: {
         title,
         branch,
-        semester,
-        fileUrl,
+        semester: parseInt(semester),
         subjectId,
-        uploadedById: userId,
+        fileUrl: req.file.location, // ✅ file URL from S3
+        uploadedById: req.user.id,
       },
     });
 
@@ -44,11 +81,12 @@ router.post("/note/upload", authMiddleware, async (req, res) => {
       message: "Note uploaded successfully",
       note,
     });
-  } catch (err) {
-    console.error("Upload error:", err);
-    return res.status(500).json({ error: "Internal Server Error" });
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 
 router.get("/note/all", async (req,res)=>{
     try{

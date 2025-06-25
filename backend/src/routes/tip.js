@@ -11,7 +11,7 @@ const prisma=new PrismaClient()
 router.post("/tip", authMiddleware, async (req,res)=>{
     try{
         const parsed=tipSchema.safeParse(req.body)
-        if(!parsed){
+        if(!parsed.success){
             res.status(400).json({errors: parsed.error.errors})
         }
         const {title, content}=parsed.data
@@ -32,6 +32,8 @@ router.post("/tip", authMiddleware, async (req,res)=>{
 
 router.get("/tip/all", async (req,res)=>{
     try{
+        console.log("hello");
+        
         const tips=await prisma.tip.findMany({
             where:{status:"APPROVED"},
             orderBy:{createdAt:"desc"},

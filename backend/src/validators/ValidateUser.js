@@ -4,7 +4,7 @@ export const signupSchema = z.object({
   email: z.string().email(),
   name: z.string().min(5, "Name must be at least 5 characters!!"),
   password: z.string().min(6, "Password must be at least 6 characters!!"),
-  role: z.enum(["ADMIN", "CUSTOMER"]).default("CUSTOMER")
+  role: z.enum(["ADMIN", "STUDENT"]).default("STUDENT")
 });
 
 
@@ -18,13 +18,13 @@ export const otpVerifySchema=z.object({
     otp:z.string().regex(/^\d{6}$/, "OTP must be exactly 6 digits")
 })
 
-export const uploadNoteSchema=z.object({
-    title: z.string().min(3),
-    branch: z.string().min(3),
-    semester: z.number().min(5).max(8),
-    subjectId: z.string().uuid(),
-    fileUrl:z.string().url()
-})
+export const uploadNoteSchema = z.object({
+  title: z.string().min(1),
+  branch: z.union([z.string(), z.array(z.string())]), // <-- allow array or string
+  semester: z.string(),
+  subjectId: z.string().uuid(),
+  fileUrl: z.string().url(),
+});
 
 export const tipSchema= z.object({
     title: z.string().min(5),

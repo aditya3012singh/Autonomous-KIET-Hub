@@ -16,6 +16,8 @@ dotenv.config();
 const router = express.Router();
 const prisma = new PrismaClient();
 const redis = new Redis();
+redis.ping().then(console.log); // Should log 'PONG'
+
 
 // ✅ Nodemailer setup
 const transporter = nodemailer.createTransport({
@@ -29,14 +31,17 @@ const transporter = nodemailer.createTransport({
 // ✅ Route to generate OTP
 router.post("/generate-otp", async (req, res) => {
   console.log("hello from otp")
-  const { email } = req.body;
+  const email = req.body.email?.toLowerCase();
+
   const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
   console.log(otpCode)
   try {
     console.log(process.env.EMAIL_USER)
     console.log(process.env.EMAIL_PASS)
     // Store OTP in Redis with 10-minute TTL
-    await redis.set(`otp:${email}`, otpCode, "EX", 600);
+const result = await redis.set(`otp:${email}`, otpCode, "EX", 600);
+console.log("✅ Redis SET result:", result); // Should log 'OK'
+
     console.log("Ram")
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
@@ -56,21 +61,47 @@ router.post("/generate-otp", async (req, res) => {
 
 // ✅ Route to verify OTP
 router.post("/verify-otp", async (req, res) => {
-  const { email, code } = req.body;
+  const email = req.body.email?.toLowerCase();
+  const code = req.body.code;
+  console.log("Incoming OTP verify body:", req.body);
 
   try {
     const storedOtp = await redis.get(`otp:${email}`);
+
+    console.log("✅ Email:", email);
+    console.log("✅ Sent OTP code:", code);
+    console.log("✅ Stored OTP from Redis:", storedOtp);
+
     if (!storedOtp || storedOtp !== code) {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
     await redis.del(`otp:${email}`);
-    await redis.set(`verified:${email}`, "true", "EX", 600); // valid for 10 more minutes
+    await redis.set(`verified:${email}`, "true", "EX", 600);
 
     return res.json({ message: "OTP verified. You can now sign up." });
   } catch (error) {
     console.error("OTP verification failed:", error);
     return res.status(500).json({ message: "Failed to verify OTP." });
+  }
+});
+
+
+
+// ✅ Check if admin already exists
+router.get("/check-admin", async (req, res) => {
+  try {
+    const adminCount = await prisma.user.count({
+      where: { role: "ADMIN" }
+    });
+
+    res.status(200).json({
+      adminExists: adminCount > 0,
+      adminCount,
+    });
+  } catch (error) {
+    console.error("Error checking admin existence:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -83,12 +114,33 @@ router.post("/signup", async (req, res) => {
       return res.status(403).json({ errors: parsed.error.errors });
     }
 
-    const { email, name, password, role } = parsed.data;
+    const { email: rawEmail, name, password, role } = parsed.data;
+    const email = rawEmail.toLowerCase(); // 🔥 Normalize email early
 
-    const isVerified = await redis.get(`verified:${email}`);
-    if (!isVerified) {
-      return res.status(403).json({ message: "Please verify your email via OTP before signing up." });
-    }
+      // Use lowercased email consistently below
+      const isVerified = await redis.get(`verified:${email}`);
+
+      console.log("Checking verified status for:", email);
+      console.log("Verified value in Redis:", isVerified);
+      if (!isVerified) {
+        return res.status(403).json({ message: "Please verify your email via OTP before signing up." });
+      }
+
+
+      // 🔒 Check if admin already exists
+      if (role === "ADMIN") {
+        const adminCount = await prisma.user.count({
+          where: { role: "ADMIN" },
+        });
+
+        if (adminCount > 0) {
+          return res.status(403).json({
+            message: "Admin already exists. Only one admin is allowed per system.",
+          });
+        }
+      }
+
+
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {

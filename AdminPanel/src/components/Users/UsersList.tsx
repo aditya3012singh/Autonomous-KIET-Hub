@@ -1,0 +1,140 @@
+import React from 'react';
+import { Shield, User, Trash2, Search } from 'lucide-react';
+import { useApi } from '../../hooks/useApi';
+import { api } from '../../utils/api';
+import { User as UserType } from '../../types';
+
+export function UsersList() {
+  const { data, loading, error, refetch } = useApi<{ users: UserType[] }>(api.getUsers);
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  const handleDeleteUser = async (userId: string) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      try {
+        await api.deleteUser(userId);
+        refetch();
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      }
+    }
+  };
+
+  const filteredUsers = data?.users?.filter(user =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="animate-pulse">
+          <div className="h-6 bg-gray-200 rounded w-1/4 mb-6"></div>
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-16 bg-gray-200 rounded-xl"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
+        <p className="text-red-800">Error loading users: {error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+      <div className="p-8 border-b border-gray-100">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-2xl font-bold text-gray-900">Users Management</h3>
+          <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            {filteredUsers.length} total users
+          </div>
+        </div>
+        
+        <div className="relative">
+          <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+          />
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-8 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                User
+              </th>
+              <th className="px-8 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                Role
+              </th>
+              <th className="px-8 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                Joined
+              </th>
+              <th className="px-8 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-100">
+            {filteredUsers.map((user) => (
+              <tr key={user.id} className="hover:bg-gray-50 transition-colors duration-200">
+                <td className="px-8 py-6 whitespace-nowrap">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <User className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="ml-4">
+                      <div className="text-base font-semibold text-gray-900">{user.name}</div>
+                      <div className="text-sm text-gray-500">{user.email}</div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-8 py-6 whitespace-nowrap">
+                  <div className="flex items-center">
+                    {user.role === 'ADMIN' ? (
+                      <Shield className="w-5 h-5 text-red-500 mr-2" />
+                    ) : (
+                      <User className="w-5 h-5 text-green-500 mr-2" />
+                    )}
+                    <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${
+                      user.role === 'ADMIN'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {user.role}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-8 py-6 whitespace-nowrap text-sm text-gray-500">
+                  {new Date(user.createdAt).toLocaleDateString()}
+                </td>
+                <td className="px-8 py-6 whitespace-nowrap text-sm text-gray-500">
+                  {user.role !== 'ADMIN' && (
+                    <button
+                      onClick={() => handleDeleteUser(user.id)}
+                      className="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-colors duration-200"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
