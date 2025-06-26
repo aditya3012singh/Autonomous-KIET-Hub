@@ -6,6 +6,9 @@ import { Overview } from './components/Dashboard/Overview';
 import { UsersList } from './components/Users/UsersList';
 import { SubjectsList } from './components/Subjects/SubjectsList';
 import { NotesList } from './components/Notes/NotesList';
+import AdminAnnouncements from './components/Announcements/AdminAnnouncement';
+import AdminEvents from './components/Events/AdminEvents';
+import AdminTips from './components/Tips/AdminTips';
 
 function AdminPanel() {
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -33,15 +36,7 @@ function AdminPanel() {
       case 'notes':
         return <NotesList />;
       case 'tips':
-        return (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">💡</span>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Tips Management</h3>
-            <p className="text-gray-500">Tips management interface coming soon...</p>
-          </div>
-        );
+        return <AdminTips/>
       case 'files':
         return (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
@@ -53,25 +48,9 @@ function AdminPanel() {
           </div>
         );
       case 'announcements':
-        return (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">📢</span>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Announcements</h3>
-            <p className="text-gray-500">Announcements management interface coming soon...</p>
-          </div>
-        );
+        return <AdminAnnouncements/>
       case 'events':
-        return (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">📅</span>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Events Management</h3>
-            <p className="text-gray-500">Events management interface coming soon...</p>
-          </div>
-        );
+        return <AdminEvents/>
       case 'feedback':
         return (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">

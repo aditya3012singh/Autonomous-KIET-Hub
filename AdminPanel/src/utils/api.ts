@@ -65,7 +65,12 @@ export const api = {
   approveNote: (id: string) => apiRequest(`/v1/notes/note/approve/${id}`, {
     method: 'PUT'
   }),
-  
+  createTip: (data: { title: string; content: string }) =>
+  apiRequest('/v1/tips/tip', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+
   // Tips
   getAllTips: () => apiRequest('/v1/tips/tip/all'),
   getPendingTips: () => apiRequest('/v1/tips/tip/pending'),
@@ -76,7 +81,12 @@ export const api = {
   deleteTip: (id: string) => apiRequest(`/v1/tips/tip/${id}`, {
     method: 'DELETE'
   }),
-  
+  bulkApproveTips: (tipIds: string[], status: 'APPROVED' | 'REJECTED') =>
+  apiRequest(`/v1/tips/tip/approve`, {
+    method: 'PUT',
+    body: JSON.stringify({ tipIds, status }),
+  }),
+
   // Files
   getFiles: () => apiRequest('/v1/files/files'),
   deleteFile: (id: string) => apiRequest(`/v1/files/file/${id}`, {

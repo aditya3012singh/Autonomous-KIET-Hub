@@ -24,6 +24,7 @@ const UserProfile: React.FC = () => {
     });
     setIsEditing(false);
   };
+  
 
   return (
     <div className="space-y-6">
@@ -36,7 +37,7 @@ const UserProfile: React.FC = () => {
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+            className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-black text-white rounded-lg transition-all"
           >
             <Edit className="h-4 w-4 mr-2" />
             Edit Profile
@@ -47,7 +48,7 @@ const UserProfile: React.FC = () => {
       {/* Profile Card */}
       <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
         <div className="flex items-center space-x-6 mb-8">
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-6">
+          <div className="bg-black rounded-full p-6">
             <User className="h-12 w-12 text-white" />
           </div>
           <div>
@@ -152,22 +153,22 @@ const UserProfile: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Activity Overview</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
-            <div className="bg-blue-100 rounded-full p-4 w-16 h-16 mx-auto mb-2">
-              <User className="h-8 w-8 text-blue-600" />
+            <div className="bg-black rounded-full p-4 w-16 h-16 mx-auto mb-2">
+              <User className="h-8 w-8 text-white" />
             </div>
             <p className="text-2xl font-bold text-gray-900">5</p>
             <p className="text-sm text-gray-600">Notes Uploaded</p>
           </div>
           <div className="text-center">
-            <div className="bg-yellow-100 rounded-full p-4 w-16 h-16 mx-auto mb-2">
-              <User className="h-8 w-8 text-yellow-600" />
+            <div className="bg-black rounded-full p-4 w-16 h-16 mx-auto mb-2">
+              <User className="h-8 w-8 text-white" />
             </div>
             <p className="text-2xl font-bold text-gray-900">3</p>
             <p className="text-sm text-gray-600">Tips Shared</p>
           </div>
           <div className="text-center">
-            <div className="bg-green-100 rounded-full p-4 w-16 h-16 mx-auto mb-2">
-              <User className="h-8 w-8 text-green-600" />
+            <div className="bg-black rounded-full p-4 w-16 h-16 mx-auto mb-2">
+              <User className="h-8 w-8 text-white" />
             </div>
             <p className="text-2xl font-bold text-gray-900">12</p>
             <p className="text-sm text-gray-600">Downloads</p>

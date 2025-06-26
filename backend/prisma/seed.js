@@ -1,134 +1,103 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
-
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminPassword = await bcrypt.hash('admin123', 10);
-  const studentPassword = await bcrypt.hash('student123', 10);
+  // Create users
+  const admin = await prisma.user.create({
+    data: {
+      name: 'Admin User',
+      email: 'admin@example.com',
+      password: 'adminpass',
+      role: 'ADMIN',
+    },
+  });
 
-  // Create Admin
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@kiet.edu' },
-    update: {},
-    create: {
-      name: 'Admin',
-      email: 'admin@kiet.edu',
-      password: adminPassword,
+  const student = await prisma.user.create({
+    data: {
+      name: 'Student User',
+      email: 'student@example.com',
+      password: 'studentpass',
       role: 'STUDENT',
     },
   });
 
-  // Create Student
-  const student = await prisma.user.upsert({
-    where: { email: 'student@kiet.edu' },
-    update: {},
-    create: {
-      name: 'Student One',
-      email: 'student@kiet.edu',
-      password: studentPassword,
-      role: 'STUDENT',
+  // Create subject
+  const subject = await prisma.subject.create({
+    data: {
+      name: 'Mathematics',
+      branch: 'CSE',
+      semester: 4,
     },
   });
 
-  // Create Subjects (skip duplicates to avoid constraint error)
-  await prisma.subject.createMany({
-    data: [
-      { name: 'Digital Logic', branch: 'Computer Science', semester: 1 },
-      { name: 'Physics', branch: 'Electronics', semester: 1 },
-    ],
-    skipDuplicates: true,
+  // Create note
+  const note = await prisma.note.create({
+    data: {
+      title: 'Linear Algebra Notes',
+      branch: 'CSE',
+      semester: 4,
+      fileUrl: 'http://example.com/la.pdf',
+      subjectId: subject.id,
+      uploadedById: student.id,
+      approvedById: admin.id,
+    },
   });
 
-  const digitalLogic = await prisma.subject.findFirst({
-    where: { name: 'Digital Logic' },
+  // Create tip
+  const tip = await prisma.tip.create({
+    data: {
+      title: 'Exam Prep',
+      content: 'Start early and solve previous papers.',
+      status: 'APPROVED',
+      postedById: student.id,
+      approvedById: admin.id,
+    },
   });
 
-  // Create Notes
-  if (digitalLogic) {
-    await prisma.note.createMany({
-      data: [
-        {
-          title: 'Boolean Algebra Basics',
-          fileUrl: 'https://example.com/boolean.pdf',
-          semester: 1,
-          branch: 'Computer Science',
-          subjectId: digitalLogic.id,
-          uploadedById: student.id,
-          approvedById: admin.id,
-        },
-        {
-          title: 'Logic Gate Truth Tables',
-          fileUrl: 'https://example.com/gates.pdf',
-          semester: 1,
-          branch: 'Computer Science',
-          subjectId: digitalLogic.id,
-          uploadedById: student.id,
-        },
-      ],
-    });
-  }
-
-  // Create Tips
-  await prisma.tip.createMany({
-    data: [
-      {
-        title: 'Use Flashcards',
-        content: 'Review key terms daily using flashcards.',
-        status: 'APPROVED',
-        postedById: student.id,
-        approvedById: admin.id,
-      },
-      {
-        title: 'Group Study',
-        content: 'Discussing topics with friends helps memory.',
-        status: 'PENDING',
-        postedById: student.id,
-      },
-    ],
+  // Create file
+  await prisma.file.create({
+    data: {
+      url: 'http://example.com/sample.pdf',
+      filename: 'sample.pdf',
+      type: 'pdf',
+      size: 123456,
+      uploadedById: student.id,
+    },
   });
 
-  // Create Events
-  await prisma.event.createMany({
-    data: [
-      {
-        title: 'Hackathon 2025',
-        content: 'Join the hackathon and build something amazing in 24 hours. Food and swags provided!',
-        eventDate: new Date('2025-08-10'),
-        createdAt: new Date(),
-      },
-      {
-        title: 'Workshop: Git & GitHub',
-        content: 'This workshop will teach you Git commands and how to collaborate using GitHub.',
-        eventDate: new Date('2025-07-15'),
-        createdAt: new Date(),
-      },
-    ],
-    skipDuplicates: true,
+  // Create feedback
+  await prisma.feedback.create({
+    data: {
+      content: 'This note is helpful!',
+      userId: student.id,
+      noteId: note.id,
+    },
   });
 
-  // Create Announcements
-  await prisma.announcement.createMany({
-    data: [
-      {
-        title: 'Mid Sem Exams Schedule',
-        message: 'Exams will be held from Aug 20 to Aug 30.',
-        postedById: admin.id,
-      },
-      {
-        title: 'Library Hours Update',
-        message: 'Library now open from 8AM to 10PM daily.',
-        postedById: admin.id,
-      },
-    ],
+  // Create announcement
+  await prisma.announcement.create({
+    data: {
+      title: 'Welcome!',
+      message: 'The platform is now live.',
+      postedById: admin.id,
+    },
   });
 
-  console.log('✅ Database seeding completed.');
+  // Create event
+  await prisma.event.create({
+    data: {
+      title: 'Orientation Day',
+      content: 'Join us for the orientation session.',
+      eventDate: new Date('2025-07-01T10:00:00Z'),
+    },
+  });
+
+  console.log('🌱 Seed data inserted!');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Seeding error:', e);
+    console.error(e);
     process.exit(1);
   })
   .finally(() => {

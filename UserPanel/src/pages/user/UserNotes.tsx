@@ -32,7 +32,7 @@ const UserNotes: React.FC = () => {
       setLoading(true);
       const response = await apiService.getAllNotes();
       // Filter only approved notes for users
-      const approvedNotes = (response.notes || []).filter(note => note.approvedById);
+      const approvedNotes = (response.notes || []).filter((note: { approvedById: any; }) => note.approvedById);
       setNotes(approvedNotes);
     } catch (error) {
       console.error('Error fetching notes:', error);
@@ -95,7 +95,7 @@ const UserNotes: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
       </div>
     );
   }
@@ -113,7 +113,7 @@ const UserNotes: React.FC = () => {
           </span>
           <button
             onClick={() => setShowUploadForm(true)}
-            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+            className="inline-flex items-center px-4 py-2 bg-black rounded-md text-white hover:bg-gray-600 transition-all"
           >
             <Plus className="h-4 w-4 mr-2" />
             Upload Note
@@ -132,7 +132,7 @@ const UserNotes: React.FC = () => {
                   type="text"
                   value={uploadData.title}
                   onChange={(e) => setUploadData({ ...uploadData, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                   required
                 />
               </div>
@@ -141,7 +141,7 @@ const UserNotes: React.FC = () => {
                 <select
                   value={uploadData.branch}
                   onChange={(e) => setUploadData({ ...uploadData, branch: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                   required
                 >
                   <option value="">Select Branch</option>
@@ -155,7 +155,7 @@ const UserNotes: React.FC = () => {
                 <select
                   value={uploadData.semester}
                   onChange={(e) => setUploadData({ ...uploadData, semester: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                   required
                 >
                   <option value="">Select Semester</option>
@@ -169,7 +169,7 @@ const UserNotes: React.FC = () => {
                 <select
                   value={uploadData.subjectId}
                   onChange={(e) => setUploadData({ ...uploadData, subjectId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                   required
                 >
                   <option value="">Select Subject</option>
@@ -186,7 +186,7 @@ const UserNotes: React.FC = () => {
               <input
                 type="file"
                 onChange={(e) => setUploadData({ ...uploadData, file: e.target.files?.[0] || null })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                 accept=".pdf,.doc,.docx,.ppt,.pptx"
                 required
               />
@@ -201,7 +201,7 @@ const UserNotes: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+                className="px-4 py-2 bg-black rounded-md hover:bg-slate-600 text-white transition-all"
               >
                 Upload Note
               </button>
@@ -220,14 +220,14 @@ const UserNotes: React.FC = () => {
               placeholder="Search notes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
             />
           </div>
           
           <select
             value={selectedBranch}
             onChange={(e) => setSelectedBranch(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
           >
             <option value="">All Branches</option>
             {branches.map(branch => (
@@ -238,7 +238,7 @@ const UserNotes: React.FC = () => {
           <select
             value={selectedSemester}
             onChange={(e) => setSelectedSemester(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
           >
             <option value="">All Semesters</option>
             {semesters.map(sem => (
@@ -246,7 +246,7 @@ const UserNotes: React.FC = () => {
             ))}
           </select>
 
-          <button className="flex items-center justify-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all">
+          <button className="flex items-center justify-center px-4 py-2 bg-black text-white rounded-md hover:bg-slate-600 transition-all">
             <Filter className="h-4 w-4 mr-2" />
             Filter
           </button>

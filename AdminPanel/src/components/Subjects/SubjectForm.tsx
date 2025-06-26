@@ -46,14 +46,14 @@ export function SubjectForm({ subject, onClose }: SubjectFormProps) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <h3 className="text-xl font-bold text-gray-900">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-gray-300">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h3 className="text-xl font-bold text-black">
             {subject ? 'Edit Subject' : 'Add New Subject'}
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+            className="text-gray-500 hover:text-black p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
           >
             <X className="w-5 h-5" />
           </button>
@@ -61,7 +61,7 @@ export function SubjectForm({ subject, onClose }: SubjectFormProps) {
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-black mb-2">
               Subject Name
             </label>
             <input
@@ -69,20 +69,20 @@ export function SubjectForm({ subject, onClose }: SubjectFormProps) {
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black bg-gray-50 text-black"
               placeholder="e.g., Database Management Systems"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-black mb-2">
               Branch
             </label>
             <select
               required
               value={formData.branch}
               onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black bg-gray-50 text-black"
             >
               <option value="">Select branch</option>
               <option value="CSE">Computer Science Engineering</option>
@@ -95,14 +95,14 @@ export function SubjectForm({ subject, onClose }: SubjectFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-black mb-2">
               Semester
             </label>
             <select
               required
               value={formData.semester}
               onChange={(e) => setFormData({ ...formData, semester: parseInt(e.target.value) })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black bg-gray-50 text-black"
             >
               {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
                 <option key={sem} value={sem}>Semester {sem}</option>
@@ -114,14 +114,14 @@ export function SubjectForm({ subject, onClose }: SubjectFormProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors duration-200 font-semibold"
+              className="flex-1 px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-xl transition-colors duration-200 font-semibold"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl transition-all duration-200 disabled:opacity-50 font-semibold shadow-lg"
+              className="flex-1 px-6 py-3 bg-black hover:bg-gray-800 text-white rounded-xl transition-all duration-200 disabled:opacity-50 font-semibold shadow-sm"
             >
               {loading ? 'Saving...' : (subject ? 'Update' : 'Create')}
             </button>

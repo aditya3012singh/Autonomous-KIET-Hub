@@ -14,6 +14,7 @@ export interface Subject {
 }
 
 export interface Note {
+  upvotes: any;
   id: string;
   title: string;
   branch: string;

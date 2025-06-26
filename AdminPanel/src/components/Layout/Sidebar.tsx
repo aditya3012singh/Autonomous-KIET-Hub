@@ -30,20 +30,20 @@ const navigation = [
 
 export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   return (
-    <div className="w-64 bg-white h-screen fixed left-0 top-0 z-40 border-r border-gray-100">
-      <div className="p-6">
+    <div className="w-64 bg-white h-screen fixed left-0 top-0 z-40 border-r border-gray-200 shadow-sm">
+      <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
             <BookOpen className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">EduShare</h1>
-            <p className="text-sm text-gray-500">Admin Panel</p>
+            <h1 className="text-xl font-bold text-black">EduShare</h1>
+            <p className="text-sm text-gray-600">Admin Panel</p>
           </div>
         </div>
       </div>
       
-      <nav className="px-4 space-y-2">
+      <nav className="px-4 py-6 space-y-2">
         {navigation.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
@@ -52,13 +52,17 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
             <button
               key={item.id}
               onClick={() => onSectionChange(item.id)}
-              className={`w-full flex items-center px-4 py-3 text-left rounded-xl transition-all duration-200 ${
+              className={`w-full flex items-center px-4 py-3 text-left rounded-xl transition-all duration-200 group ${
                 isActive
-                  ? 'bg-blue-50 text-blue-700 shadow-sm'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-black text-white shadow-md'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-black'
               }`}
             >
-              <Icon className={`w-5 h-5 mr-3 ${isActive ? 'text-blue-700' : 'text-gray-400'}`} />
+              <Icon className={`w-5 h-5 mr-3 transition-colors duration-200 ${
+                isActive 
+                  ? 'text-white' 
+                  : 'text-gray-500 group-hover:text-black'
+              }`} />
               <span className="font-medium">{item.name}</span>
             </button>
           );

@@ -19,7 +19,7 @@ const UserTips: React.FC = () => {
       setLoading(true);
       const response = await apiService.getAllTips();
       // Filter only approved tips for users
-      const approvedTips = (response.tips || []).filter(tip => tip.status === 'APPROVED');
+      const approvedTips = (response.tips || []).filter((tip: { status: string; }) => tip.status === 'APPROVED');
       setTips(approvedTips);
     } catch (error) {
       console.error('Error fetching tips:', error);
@@ -50,7 +50,7 @@ const UserTips: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
       </div>
     );
   }
@@ -65,9 +65,9 @@ const UserTips: React.FC = () => {
         </div>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+          className="mt-4 sm:mt-0 inline-flex items-center text-white rounded-md bg-black hover:bg-gray-600 px-4 py-2  transition-all"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 mr-2 text-white" />
           Share a Tip
         </button>
       </div>
@@ -129,7 +129,7 @@ const UserTips: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+                className="px-4 py-2 bg-black text-white hover:bg-slate-600 rounded-md hover:bg-gray-800 transition-all"
               >
                 Submit Tip
               </button>

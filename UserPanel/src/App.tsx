@@ -4,17 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/Auth/LoginForm';
 import SignupForm from './components/Auth/SignupForm';
 import ProtectedRoute from './components/ProtectedRoute';
-import AdminLayout from './components/Layout/AdminLayout';
 import UserLayout from './components/Layout/UserLayout';
-
-// Admin Pages
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminNotes from './pages/admin/AdminNotes';
-import AdminTips from './pages/admin/AdminTips';
-import AdminEvents from './pages/admin/AdminEvents';
-import AdminAnnouncements from './pages/admin/AdminAnnouncements';
-import AdminUsers from './pages/admin/AdminUsers';
-import AdminSubjects from './pages/admin/AdminSubjects';
 
 // User Pages
 import UserDashboard from './pages/user/UserDashboard';
@@ -52,22 +42,6 @@ const AppContent: React.FC = () => {
         />
 
         {/* Admin Routes */}
-        <Route
-          path="/admin/*"
-          element={
-            <ProtectedRoute adminOnly>
-              <AdminLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<AdminDashboard />} />
-          <Route path="notes" element={<AdminNotes />} />
-          <Route path="tips" element={<AdminTips />} />
-          <Route path="events" element={<AdminEvents />} />
-          <Route path="announcements" element={<AdminAnnouncements />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="subjects" element={<AdminSubjects />} />
-        </Route>
 
         {/* User Routes */}
         <Route

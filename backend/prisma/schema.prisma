@@ -45,7 +45,7 @@ model Note {
   approvedBy   User?      @relation("NoteApprovedBy", fields: [approvedById], references: [id])
   subject      Subject    @relation(fields: [subjectId], references: [id])
   uploadedBy   User       @relation("UserNotes", fields: [uploadedById], references: [id])
-}
+ }
 
 model Tip {
   id           String     @id @default(uuid())
