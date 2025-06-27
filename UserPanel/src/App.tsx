@@ -13,6 +13,8 @@ import UserTips from './pages/user/UserTips';
 import UserEvents from './pages/user/UserEvents';
 import UserAnnouncements from './pages/user/UserAnnouncements';
 import UserProfile from './pages/user/UserProfile';
+import TipDetail from './pages/user/TipDetail';
+import NoteDetail from './pages/user/NoteDetail'; // ✅ Add this import
 
 const AppContent: React.FC = () => {
   const { user, isLoading } = useAuth();
@@ -41,7 +43,7 @@ const AppContent: React.FC = () => {
           element={user ? <Navigate to={user.role === 'ADMIN' ? '/admin' : '/user'} replace /> : <SignupForm />} 
         />
 
-        {/* Admin Routes */}
+        {/* Admin Routes - Add if needed */}
 
         {/* User Routes */}
         <Route
@@ -54,13 +56,15 @@ const AppContent: React.FC = () => {
         >
           <Route index element={<UserDashboard />} />
           <Route path="notes" element={<UserNotes />} />
+          <Route path="notes/:id" element={<NoteDetail />} /> {/* ✅ Add this line */}
           <Route path="tips" element={<UserTips />} />
+          <Route path="tips/:id" element={<TipDetail />} />
           <Route path="events" element={<UserEvents />} />
           <Route path="announcements" element={<UserAnnouncements />} />
           <Route path="profile" element={<UserProfile />} />
         </Route>
-
-        {/* Root redirect based on user role */}
+        
+        {/* Root Redirect */}
         <Route 
           path="/" 
           element={
@@ -72,7 +76,7 @@ const AppContent: React.FC = () => {
           } 
         />
 
-        {/* Catch all route */}
+        {/* Catch All */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

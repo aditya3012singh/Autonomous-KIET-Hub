@@ -90,3 +90,8 @@ export const deleteContentSchema = z.object({
   type: z.enum(["TIP", "NOTE", "FILE", "FEEDBACK"]),
   id: z.string().uuid()
 });
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(1, "Name is required").optional(),
+  password: z.string().min(6, "Password must be at least 6 characters").optional(),
+});

@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import { PrismaClient } from '@prisma/client';
 import Redis from "ioredis";
-import { loginSchema, signupSchema } from "../validators/ValidateUser.js";
+import { loginSchema, signupSchema, updateProfileSchema } from "../validators/ValidateUser.js";
 import { error } from "console";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { isAdmin } from "../middlewares/isAdmin.js";
@@ -191,15 +191,18 @@ router.post("/signin", async (req, res) => {
       return res.status(400).json({ errors: parsed.error.errors, message: "Invalid credentials" });
     }
 
-    const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+    const user = await prisma.user.findUnique({
+      where: { email: parsed.data.email },
+    });
+
     if (!user) {
       return res.status(403).json({ error: "User not found" });
     }
 
-    // const isPasswordValid = await bcrypt.compare(parsed.data.password, user.password);
-    // if (!isPasswordValid) {
-    //   return res.status(401).json({ error: "Incorrect password" });
-    // }
+    const isPasswordValid = await bcrypt.compare(parsed.data.password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Incorrect password" });
+    }
 
     const token = jwt.sign(
       { id: user.id },
@@ -207,15 +210,20 @@ router.post("/signin", async (req, res) => {
       { expiresIn: "1h" }
     );
 
+    // Return user without password
+    const { password, ...userWithoutPassword } = user;
+
     res.json({
       message: "Login successful",
-      jwt: token
+      jwt: token,
+      user: userWithoutPassword, // 👈 now frontend gets proper user object
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Login failed due to server error" });
   }
 });
+
 
 
 // Delete User route
@@ -280,6 +288,46 @@ router.get("/users", authMiddleware, isAdmin, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+
+// PUT /update-profile - update name or password
+router.put("/update-profile", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const parsed = updateProfileSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      return res.status(400).json({ errors: parsed.error.errors });
+    }
+
+    const { name, password } = parsed.data;
+    const updateData = {};
+
+    if (name) updateData.name = name;
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateData.password = hashedPassword;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+
+    res.status(200).json({ message: "Profile updated", user: updatedUser });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 export default router;
 

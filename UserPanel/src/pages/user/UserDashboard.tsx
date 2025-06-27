@@ -10,9 +10,12 @@ import {
   Clock,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const UserDashboard: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
   const [stats, setStats] = useState([
     { name: 'My Notes', value: '0', icon: BookOpen },
     { name: 'Study Tips', value: '0', icon: Lightbulb },
@@ -33,7 +36,7 @@ const UserDashboard: React.FC = () => {
         const res = await fetch('http://localhost:3000/api/overview');
         const data = await res.json();
         setStats([
-          { name: 'My Notes', value: '5', icon: BookOpen },
+          { name: 'Notes', value: data.notes, icon: BookOpen },
           { name: 'Study Tips', value: data.tips || '0', icon: Lightbulb },
           { name: 'Upcoming Events', value: data.events || '0', icon: Calendar },
           { name: 'Announcements', value: data.announcements || '0', icon: MessageSquare },
@@ -65,22 +68,32 @@ const UserDashboard: React.FC = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <div
-            key={stat.name}
-            className="bg-white text-black rounded-xl p-6 shadow border border-gray-200 hover:shadow-md transition"
-          >
-            <div className="flex items-center">
-              <div className="bg-gray-800 p-3 rounded-lg">
-                <stat.icon className="h-6 w-6 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                <p className="text-2xl font-bold text-black">{stat.value}</p>
+        {stats.map((stat) => {
+          const handleClick = () => {
+            if (stat.name.includes('Note')) navigate('/user/notes');
+            else if (stat.name.includes('Tip')) navigate('/user/tips');
+            else if (stat.name.includes('Announcement')) navigate('/user/announcements');
+            else if (stat.name.includes('Event')) navigate('/user/events');
+          };
+
+          return (
+            <div
+              key={stat.name}
+              onClick={handleClick}
+              className="cursor-pointer bg-white text-black rounded-xl p-6 shadow border border-gray-200 hover:shadow-md transition"
+            >
+              <div className="flex items-center">
+                <div className="bg-gray-800 p-3 rounded-lg">
+                  <stat.icon className="h-6 w-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">{stat.name}</p>
+                  <p className="text-2xl font-bold text-black">{stat.value}</p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

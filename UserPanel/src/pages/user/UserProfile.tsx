@@ -1,20 +1,27 @@
 import React, { useState } from 'react';
 import { User, Mail, Calendar, Shield, Edit, Save, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiService } from '../../services/api';
+import toast from 'react-hot-toast';
 
 const UserProfile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth(); // ✅ include setUser to update context
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
   });
 
-  const handleSave = () => {
-    // Here you would typically make an API call to update the user profile
-    console.log('Saving profile:', formData);
-    setIsEditing(false);
-    // You might want to update the user context here as well
+  const handleSave = async () => {
+    try {
+      const res = await apiService.updateProfile(formData);
+      toast.success("Profile updated!");
+      setUser(res.user); // ✅ update context for real-time sync
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Update failed:", error);
+      toast.error("Failed to update profile");
+    }
   };
 
   const handleCancel = () => {
@@ -24,7 +31,6 @@ const UserProfile: React.FC = () => {
     });
     setIsEditing(false);
   };
-  
 
   return (
     <div className="space-y-6">
@@ -91,8 +97,8 @@ const UserProfile: React.FC = () => {
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
                 />
               ) : (
                 <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
@@ -145,34 +151,6 @@ const UserProfile: React.FC = () => {
               </button>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Activity Stats */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Activity Overview</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="bg-black rounded-full p-4 w-16 h-16 mx-auto mb-2">
-              <User className="h-8 w-8 text-white" />
-            </div>
-            <p className="text-2xl font-bold text-gray-900">5</p>
-            <p className="text-sm text-gray-600">Notes Uploaded</p>
-          </div>
-          <div className="text-center">
-            <div className="bg-black rounded-full p-4 w-16 h-16 mx-auto mb-2">
-              <User className="h-8 w-8 text-white" />
-            </div>
-            <p className="text-2xl font-bold text-gray-900">3</p>
-            <p className="text-sm text-gray-600">Tips Shared</p>
-          </div>
-          <div className="text-center">
-            <div className="bg-black rounded-full p-4 w-16 h-16 mx-auto mb-2">
-              <User className="h-8 w-8 text-white" />
-            </div>
-            <p className="text-2xl font-bold text-gray-900">12</p>
-            <p className="text-sm text-gray-600">Downloads</p>
-          </div>
         </div>
       </div>
     </div>

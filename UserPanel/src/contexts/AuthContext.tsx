@@ -9,43 +9,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored user session
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
-    
+
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
     }
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const response = await apiService.signin(email, password);
-      
-      // The backend returns jwt token, we need to decode it or get user info
-      // For now, we'll store the token and create a basic user object
-      const token = response.jwt;
-      localStorage.setItem('token', token);
-      
-      // Create a basic user object (you might want to add an endpoint to get current user)
-      const userData: User = {
-        id: 'current-user', // This should come from token decode or separate endpoint
-        name: email.split('@')[0], // Temporary - should come from backend
-        email: email,
-        role: email.includes('admin') ? 'ADMIN' : 'STUDENT', // Temporary logic
-        createdAt: new Date().toISOString(),
-      };
-      
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-    } catch (error) {
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+const login = async (email: string, password: string) => {
+  setIsLoading(true);
+  try {
+    const response = await apiService.signin(email, password);
+    const token = response.jwt;
+    const userData: User = response.user;
+
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+
+    setUser(userData);
+  } catch (error) {
+    throw error;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const logout = () => {
     setUser(null);
@@ -54,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading, setUser }}>
       {children}
     </AuthContext.Provider>
   );

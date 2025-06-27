@@ -1,12 +1,19 @@
 const API_BASE_URL = 'http://localhost:3000/api/v1';
 
 class ApiService {
+  
   private getAuthHeaders() {
     const token = localStorage.getItem('token');
     return {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
     };
+  }
+  async getTipById(id: string) {
+  const response = await fetch(`http://localhost:3000/api/v1/tips/tip/${id}`, {
+    headers: this.getAuthHeaders(),
+  });
+  return this.handleResponse(response);
   }
 
   private async handleResponse(response: Response) {
@@ -16,7 +23,7 @@ class ApiService {
     }
     return response.json();
   }
-
+  
   // Auth endpoints
   async generateOtp(email: string) {
     const response = await fetch(`${API_BASE_URL}/users/generate-otp`, {
@@ -26,7 +33,7 @@ class ApiService {
     });
     return this.handleResponse(response);
   }
-
+  
   async verifyOtp(email: string, code: string) {
     const response = await fetch(`${API_BASE_URL}/users/verify-otp`, {
       method: 'POST',
@@ -64,7 +71,7 @@ class ApiService {
   // Notes endpoints
   async uploadNote(noteData: FormData) {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:3000/api/notes/note/upload`, {
+    const response = await fetch(`http://localhost:3000/api/v1/notes/note/upload`, {
       method: 'POST',
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }), // ✅ no "Content-Type"
@@ -131,6 +138,14 @@ class ApiService {
     });
     return this.handleResponse(response);
   }
+async updateProfile(data: { name?: string; password?: string }) {
+  const response = await fetch(`${API_BASE_URL}/auth/update-profile`, {
+    method: 'PUT',
+    headers: this.getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return this.handleResponse(response);
+}
 
   async approveTip(id: string, status: 'APPROVED' | 'REJECTED') {
     const response = await fetch(`${API_BASE_URL}/tips/tip/approve/${id}`, {
@@ -324,6 +339,8 @@ class ApiService {
     });
     return this.handleResponse(response);
   }
+
+  
 }
 
 export const apiService = new ApiService();

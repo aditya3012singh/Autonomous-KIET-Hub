@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Download, Eye, Star, Clock, User, Plus } from 'lucide-react';
 import { Note, Subject } from '../../types';
 import { apiService } from '../../services/api';
@@ -19,7 +20,9 @@ const UserNotes: React.FC = () => {
     file: null as File | null,
   });
 
-  const branches = ['Computer Science', 'Electronics', 'Mechanical', 'Civil'];
+  const navigate = useNavigate(); // ✅ for page navigation
+
+  const branches = ['CSE', 'ECE', 'Mechanical', 'ELCE', 'EEE', 'CSE-AI', 'CSE-AIML', 'CS', 'IT', 'CSIT'];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
 
   useEffect(() => {
@@ -31,8 +34,7 @@ const UserNotes: React.FC = () => {
     try {
       setLoading(true);
       const response = await apiService.getAllNotes();
-      // Filter only approved notes for users
-      const approvedNotes = (response.notes || []).filter((note: { approvedById: any; }) => note.approvedById);
+      const approvedNotes = (response.notes || []).filter((note: { approvedById: any }) => note.approvedById);
       setNotes(approvedNotes);
     } catch (error) {
       console.error('Error fetching notes:', error);
@@ -53,7 +55,7 @@ const UserNotes: React.FC = () => {
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadData.title || !uploadData.branch || !uploadData.semester || !uploadData.subjectId || !uploadData.file) {
-      alert("Please fill out all fields and select a file.");
+      alert('Please fill out all fields and select a file.');
       return;
     }
 
@@ -66,26 +68,21 @@ const UserNotes: React.FC = () => {
       formData.append('file', uploadData.file);
 
       await apiService.uploadNote(formData);
-      alert("Note uploaded successfully and is pending approval.");
+      alert('Note uploaded successfully and is pending approval.');
 
       setShowUploadForm(false);
-      setUploadData({
-        title: '',
-        branch: '',
-        semester: '',
-        subjectId: '',
-        file: null,
-      });
+      setUploadData({ title: '', branch: '', semester: '', subjectId: '', file: null });
       fetchNotes();
     } catch (error) {
       console.error('Error uploading note:', error);
-      alert("Failed to upload note.");
+      alert('Failed to upload note.');
     }
   };
 
   const filteredNotes = notes.filter(note => {
-    const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         note.subject?.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      note.subject?.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesBranch = !selectedBranch || note.branch === selectedBranch;
     const matchesSemester = !selectedSemester || note.semester.toString() === selectedSemester;
 
@@ -102,6 +99,7 @@ const UserNotes: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Study Notes</h1>
@@ -121,11 +119,13 @@ const UserNotes: React.FC = () => {
         </div>
       </div>
 
+      {/* Upload Form */}
       {showUploadForm && (
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Upload New Note</h2>
           <form onSubmit={handleUploadSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Title */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
                 <input
@@ -136,6 +136,8 @@ const UserNotes: React.FC = () => {
                   required
                 />
               </div>
+
+              {/* Branch */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Branch</label>
                 <select
@@ -150,6 +152,8 @@ const UserNotes: React.FC = () => {
                   ))}
                 </select>
               </div>
+
+              {/* Semester */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Semester</label>
                 <select
@@ -164,6 +168,8 @@ const UserNotes: React.FC = () => {
                   ))}
                 </select>
               </div>
+
+              {/* Subject */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
                 <select
@@ -181,6 +187,8 @@ const UserNotes: React.FC = () => {
                 </select>
               </div>
             </div>
+
+            {/* File Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">File</label>
               <input
@@ -191,6 +199,8 @@ const UserNotes: React.FC = () => {
                 required
               />
             </div>
+
+            {/* Actions */}
             <div className="flex justify-end space-x-3">
               <button
                 type="button"
@@ -223,7 +233,7 @@ const UserNotes: React.FC = () => {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
             />
           </div>
-          
+
           <select
             value={selectedBranch}
             onChange={(e) => setSelectedBranch(e.target.value)}
@@ -287,12 +297,15 @@ const UserNotes: React.FC = () => {
               <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                 Approved
               </span>
-              
+
               <div className="flex space-x-2">
-                <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                <button
+                  onClick={() => navigate(`/user/notes/${note.id}`)} // 👈 Navigate to detail page
+                  className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                >
                   <Eye className="h-4 w-4" />
                 </button>
-                <button 
+                <button
                   onClick={() => window.open(note.fileUrl, '_blank')}
                   className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                 >
