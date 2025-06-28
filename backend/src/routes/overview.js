@@ -8,11 +8,12 @@ const prisma = new PrismaClient();
 router.get('/', async (req, res) => {
   try {
     const [notes, tips, events, announcements] = await Promise.all([
-      prisma.note.count(),
-      prisma.tip.count(),
+      prisma.note.count({ where: { approvedById: { not: null } } }), // ✅ only approved notes
+      prisma.tip.count({ where: { approvedById: { not: null } } }),
       prisma.event.count(),
       prisma.announcement.count(),
     ]);
+
 
     res.json({ notes, tips, events, announcements });
   } catch (err) {

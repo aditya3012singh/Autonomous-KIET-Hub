@@ -21,7 +21,18 @@ model User {
   notes         Note[]         @relation("UserNotes")
   approvedTips  Tip[]          @relation("TipApprovedBy")
   tips          Tip[]          @relation("UserTips")
+  activities    Activity[]
 }
+
+model Activity {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  subject   String?
+  time      DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
 
 model Subject {
   id       String @id @default(uuid())

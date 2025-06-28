@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client"
 import { authMiddleware } from "../middlewares/authMiddleware.js"
 import { isAdmin } from "../middlewares/isAdmin.js"
 import { announcementSchema } from "../validators/ValidateUser.js"
+import { logActivity } from "../utils/logActivity.js"
 
 const prisma= new PrismaClient()
 const router= express.Router()
@@ -23,6 +24,8 @@ router.post("/announcement", authMiddleware, isAdmin, async(req,res)=>{
                 postedById: req.user.id
             }
         })
+        await logActivity(req.user.id, 'Posted an announcement', announcement.title);
+
         res.status(201).json({message:"Announcement created", announcement})
     }catch(error){
         console.error("Error creating announcement:", err);

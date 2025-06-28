@@ -104,10 +104,26 @@ router.get("/check-admin", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+// ✅ Check if a user with given email exists
+router.get("/check-user", async (req, res) => {
+  const email = req.query.email?.toString().toLowerCase();
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  try {
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+
+    res.status(200).json({ exists: !!existingUser });
+  } catch (error) {
+    console.error("Error checking user existence:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 // ✅ Signup route (with OTP check)
 router.post("/signup", async (req, res) => {
-  console.log("hello")
   try {
     const parsed = signupSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -144,7 +160,7 @@ router.post("/signup", async (req, res) => {
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return res.status(409).json({ error: "User already exists" });
+      return res.status(409).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -196,12 +212,12 @@ router.post("/signin", async (req, res) => {
     });
 
     if (!user) {
-      return res.status(403).json({ error: "User not found" });
+      return res.status(403).json({ message: "User not found" });
     }
 
     const isPasswordValid = await bcrypt.compare(parsed.data.password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: "Incorrect password" });
+      return res.status(401).json({ message: "Incorrect password" });
     }
 
     const token = jwt.sign(

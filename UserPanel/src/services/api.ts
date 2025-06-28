@@ -1,4 +1,5 @@
 const API_BASE_URL = 'http://localhost:3000/api/v1';
+import { toast } from 'react-toastify'
 
 class ApiService {
   
@@ -16,13 +17,29 @@ class ApiService {
   return this.handleResponse(response);
   }
 
-  private async handleResponse(response: Response) {
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Network error' }));
-      throw new Error(error.message || 'Request failed');
+
+  async handleResponse(response: Response) {
+    if (response.status === 401) {
+      toast.error('Session expired. Please log in again.');
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+      return; // Stop further execution
     }
-    return response.json();
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      throw new Error('Invalid response format.');
+    }
+
+    if (!response.ok) {
+      throw new Error(data?.message || 'Unexpected error');
+    }
+
+    return data;
   }
+
   
   // Auth endpoints
   async generateOtp(email: string) {
@@ -94,6 +111,12 @@ class ApiService {
     });
     return this.handleResponse(response);
   }
+async checkUserExists(email: string) {
+  const response = await fetch(`${API_BASE_URL}/users/check-user?email=${encodeURIComponent(email)}`, {
+    headers: { 'Content-Type': 'application/json' },
+  });
+  return this.handleResponse(response); // will return { exists: true/false }
+}
 
   async filterNotes(filters: { branch?: string; semester?: string; subjectId?: string }) {
     const params = new URLSearchParams();
@@ -339,8 +362,12 @@ async updateProfile(data: { name?: string; password?: string }) {
     });
     return this.handleResponse(response);
   }
-
-  
+  async getRecentActivity() {
+  const response = await fetch('http://localhost:3000/api/v1/activity/recent', {
+    headers: this.getAuthHeaders(),
+  });
+  return this.handleResponse(response);
+  }
 }
 
 export const apiService = new ApiService();

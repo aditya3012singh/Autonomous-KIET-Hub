@@ -4,6 +4,7 @@ import { authMiddleware } from "../middlewares/authMiddleware.js"
 import { moderateTipSchema, tipSchema } from "../validators/ValidateUser.js"
 import { isAdmin } from "../middlewares/isAdmin.js"
 import {z} from "zod"
+import { logActivity } from "../utils/logActivity.js"
 
 const router=express.Router()
 const prisma=new PrismaClient()
@@ -219,6 +220,7 @@ router.put("/tip/approve", authMiddleware, isAdmin, async (req, res) => {
         approvedById: req.user.id,
       },
     });
+    await logActivity(req.user.id, 'Shared a tip', tip.title);
 
     return res.status(200).json({ message: `Tips ${status.toLowerCase()}`, count: updated.count });
   } catch (error) {

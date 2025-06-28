@@ -3,6 +3,7 @@ import express from "express"
 import { authMiddleware } from "../middlewares/authMiddleware.js"
 import { isAdmin } from "../middlewares/isAdmin.js"
 import { eventSchema } from "../validators/ValidateUser.js"
+import { logActivity } from "../utils/logActivity.js"
 
 
 const prisma = new PrismaClient()
@@ -24,6 +25,8 @@ router.post("/event", authMiddleware, isAdmin, async(req,res)=>{
                 eventDate: new Date(eventDate)
             }
         })
+        await logActivity(req.user.id, 'Created an event', event.title);
+
         res.status(201).json({message:"event created",event})
     } catch (err) {
         console.error("Error creating event:", err);
