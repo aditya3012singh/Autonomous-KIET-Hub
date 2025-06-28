@@ -5,6 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ChatProvider } from './contexts/ChatContext'; // ✅ Add this import
 
 import LoginForm from './components/Auth/LoginForm';
 import SignupForm from './components/Auth/SignupForm';
@@ -20,7 +21,8 @@ import UserProfile from './pages/user/UserProfile';
 import TipDetail from './pages/user/TipDetail';
 import NoteDetail from './pages/user/NoteDetail';
 
-import Home from './pages/user/Home'; // ✅ Your custom homepage
+import Home from './pages/user/Home';
+import ChatInterface from './components/chat/ChatInterface';
 
 const AppContent: React.FC = () => {
   const { user, isLoading } = useAuth();
@@ -38,27 +40,12 @@ const AppContent: React.FC = () => {
 
   return (
     <Routes>
-      {/* 🔓 Public Routes */}
-      <Route
-        path="/"
-        element={
-          user ? <Navigate to="/user" replace /> : <Home />
-        }
-      />
-      <Route
-        path="/login"
-        element={
-          user ? <Navigate to="/user" replace /> : <LoginForm />
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          user ? <Navigate to="/user" replace /> : <SignupForm />
-        }
-      />
+      {/* Public routes */}
+      <Route path="/" element={user ? <Navigate to="/user" replace /> : <Home />} />
+      <Route path="/login" element={user ? <Navigate to="/user" replace /> : <LoginForm />} />
+      <Route path="/signup" element={user ? <Navigate to="/user" replace /> : <SignupForm />} />
 
-      {/* 🔐 Protected User Routes */}
+      {/* Protected user routes */}
       <Route
         path="/user/*"
         element={
@@ -74,10 +61,11 @@ const AppContent: React.FC = () => {
         <Route path="tips/:id" element={<TipDetail />} />
         <Route path="events" element={<UserEvents />} />
         <Route path="announcements" element={<UserAnnouncements />} />
+        <Route path="chat" element={<ChatInterface />} /> {/* ✅ Chat route */}
         <Route path="profile" element={<UserProfile />} />
       </Route>
 
-      {/* 🔁 Catch-all redirect */}
+      {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -87,8 +75,10 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
-        <AppContent />
+        <ChatProvider> {/* ✅ Wrap with ChatProvider */}
+          <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+          <AppContent />
+        </ChatProvider>
       </AuthProvider>
     </Router>
   );

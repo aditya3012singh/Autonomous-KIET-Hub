@@ -162,7 +162,7 @@ async checkUserExists(email: string) {
     return this.handleResponse(response);
   }
 async updateProfile(data: { name?: string; password?: string }) {
-  const response = await fetch(`${API_BASE_URL}/auth/update-profile`, {
+  const response = await fetch(`${API_BASE_URL}/users/update-profile`, {
     method: 'PUT',
     headers: this.getAuthHeaders(),
     body: JSON.stringify(data),

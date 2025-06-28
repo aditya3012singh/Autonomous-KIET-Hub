@@ -14,6 +14,7 @@ import {
   GraduationCap,
   Bell,
   Search,
+  MessageCircle,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
@@ -45,6 +46,7 @@ const UserLayout: React.FC = () => {
     { name: 'Study Tips', href: '/user/tips', icon: Lightbulb, color: 'from-amber-500 to-amber-600' },
     { name: 'Events', href: '/user/events', icon: Calendar, color: 'from-green-500 to-green-600' },
     { name: 'Announcements', href: '/user/announcements', icon: MessageSquare, color: 'from-red-500 to-red-600' },
+    { name: 'Chat', href: '/user/chat', icon: MessageCircle, color: 'from-cyan-500 to-cyan-600' },
     { name: 'Profile', href: '/user/profile', icon: User, color: 'from-slate-500 to-slate-600' },
   ];
 
