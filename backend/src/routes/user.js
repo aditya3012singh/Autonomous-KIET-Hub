@@ -33,12 +33,17 @@ redis.on("error", (err) => {
 
 // ✅ Nodemailer setup
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: false, // true for port 465, false for 587
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
   },
 });
+
+
+
 
 // ✅ Route to generate OTP
 router.post("/generate-otp", async (req, res) => {
@@ -51,8 +56,8 @@ router.post("/generate-otp", async (req, res) => {
     console.log(process.env.EMAIL_USER)
     console.log(process.env.EMAIL_PASS)
     // Store OTP in Redis with 10-minute TTL
-const result = await redis.set(`otp:${email}`, otpCode, "EX", 600);
-console.log("✅ Redis SET result:", result); // Should log 'OK'
+    const result = await redis.set(`otp:${email}`, otpCode, "EX", 600);
+    console.log("✅ Redis SET result:", result); // Should log 'OK'
 
     console.log("Ram")
     await transporter.sendMail({
