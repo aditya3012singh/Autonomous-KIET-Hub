@@ -15,35 +15,18 @@ dotenv.config();
 
 const router = express.Router();
 const prisma = new PrismaClient();
-
-// ✅ Connect to cloud Redis using REDIS_URL from .env
-const redis = new Redis(process.env.REDIS_URL, {
-  tls: process.env.REDIS_URL?.startsWith('rediss://') ? {} : undefined,
-});
-
-redis.on("connect", () => {
-  console.log("✅ Connected to Redis");
-});
-
-redis.on("error", (err) => {
-  console.error("❌ Redis connection error:", err);
-});
-
+const redis = new Redis();
+redis.ping().then(console.log); // Should log 'PONG'
 
 
 // ✅ Nodemailer setup
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: false, // true for port 465, false for 587
+  service: "gmail",
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
-
-
-
 
 // ✅ Route to generate OTP
 router.post("/generate-otp", async (req, res) => {
@@ -56,8 +39,8 @@ router.post("/generate-otp", async (req, res) => {
     console.log(process.env.EMAIL_USER)
     console.log(process.env.EMAIL_PASS)
     // Store OTP in Redis with 10-minute TTL
-    const result = await redis.set(`otp:${email}`, otpCode, "EX", 600);
-    console.log("✅ Redis SET result:", result); // Should log 'OK'
+  const result = await redis.set(`otp:${email}`, otpCode, "EX", 600);
+  console.log("✅ Redis SET result:", result); // Should log 'OK'
 
     console.log("Ram")
     await transporter.sendMail({

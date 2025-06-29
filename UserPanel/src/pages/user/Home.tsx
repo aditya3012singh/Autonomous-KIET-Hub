@@ -425,7 +425,7 @@ const handleFormSubmit = async (e: React.FormEvent) => {
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 animate-slide-up">
               <div className="relative mb-6">
                 <img
-                  src="https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=400"
+                  src="/1736004729532.jpg"
                   alt="Profile image of Aditya Singh"
                   className="w-28 h-28 rounded-full mx-auto object-cover border-4 border-gradient-to-r from-blue-500 to-purple-500 transform hover:scale-110 transition-transform duration-300"
                 />

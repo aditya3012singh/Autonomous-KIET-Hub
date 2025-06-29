@@ -1,5 +1,5 @@
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = 'http://localhost:3000/api/v1';
+import { toast } from 'react-toastify';
 
 let forceLogoutFn: () => void = () => {};
 
@@ -18,7 +18,7 @@ class ApiService {
     };
   }
   async getTipById(id: string) {
-  const response = await fetch(`${API_BASE_URL}/tips/tip/${id}`, {
+  const response = await fetch(`http://localhost:3000/api/v1/tips/tip/${id}`, {
     headers: this.getAuthHeaders(),
   });
   return this.handleResponse(response);
@@ -94,7 +94,7 @@ class ApiService {
   // Notes endpoints
   async uploadNote(noteData: FormData) {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/notes/note/upload`, {
+    const response = await fetch(`http://localhost:3000/api/v1/notes/note/upload`, {
       method: 'POST',
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }), // ✅ no "Content-Type"
@@ -146,7 +146,7 @@ async checkUserExists(email: string) {
 
   // Tips endpoints
   async createTip(tipData: { title: string; content: string }) {
-    const response = await fetch(`${API_BASE_URL}/tips/tip`, {
+    const response = await fetch(`http://localhost:3000/api/v1/tips/tip`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(tipData),
@@ -155,7 +155,7 @@ async checkUserExists(email: string) {
   }
 
   async getAllTips() {
-    const response = await fetch(`${API_BASE_URL}/tips/tip/all`, {
+    const response = await fetch(`http://localhost:3000/api/v1/tips/tip/all`, {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse(response);
@@ -376,7 +376,7 @@ async updateProfile(data: { name?: string; password?: string }) {
     return this.handleResponse(response);
   }
   async getRecentActivity() {
-  const response = await fetch(`${API_BASE_URL}/activity/recent`, {
+  const response = await fetch('http://localhost:3000/activity/recent', {
     headers: this.getAuthHeaders(),
   });
   return this.handleResponse(response);
