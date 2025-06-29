@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 });
 app.use('/api/overview', overviewRoutes);
 app.use('/api/v1/files',fileRouter)
-app.use('/activity',activityRoutes)
+app.use('/api/v1/activity',activityRoutes)
 app.use('/api/v1/contacts', contact)
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/subjects", subjectRouter);

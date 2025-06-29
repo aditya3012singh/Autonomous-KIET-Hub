@@ -15,8 +15,20 @@ dotenv.config();
 
 const router = express.Router();
 const prisma = new PrismaClient();
-const redis = new Redis();
-redis.ping().then(console.log); // Should log 'PONG'
+
+// ✅ Connect to cloud Redis using REDIS_URL from .env
+const redis = new Redis(process.env.REDIS_URL, {
+  tls: process.env.REDIS_URL?.startsWith('rediss://') ? {} : undefined,
+});
+
+redis.on("connect", () => {
+  console.log("✅ Connected to Redis");
+});
+
+redis.on("error", (err) => {
+  console.error("❌ Redis connection error:", err);
+});
+
 
 
 // ✅ Nodemailer setup

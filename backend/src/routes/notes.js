@@ -137,17 +137,10 @@ router.get("/note/:id", async (req,res)=>{
 router.put("/note/approve/:id", authMiddleware, isAdmin, async (req, res) => {
   try {
     const noteId = req.params.id;
-    console.log("User attempting to approve:", req.user);
-    console.log("Approving note ID:", noteId);
-
     const existingNote = await prisma.note.findUnique({
       where: { id: req.params.id }
     });
-    console.log(existingNote)
-    console.log("noteId received:", req.params.id);
     if (!existingNote) {
-      console.log("Note not found in DB.");
-      console.log("somethting")
       return res.status(404).json({ message: "Note not found" });
     }
 

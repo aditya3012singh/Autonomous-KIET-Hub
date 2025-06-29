@@ -126,7 +126,7 @@ const ChatInterface: React.FC = () => {
   const handleCreateRoom = (e: React.FormEvent) => {
     e.preventDefault();
     if (newRoomData.name.trim()) {
-      createRoom(newRoomData.name, newRoomData.description, newRoomData.type);
+      // createRoom(newRoomData.name, newRoomData.description, newRoomData.type);
       setNewRoomData({ name: '', description: '', type: 'study-group' });
       setShowCreateRoom(false);
     }
