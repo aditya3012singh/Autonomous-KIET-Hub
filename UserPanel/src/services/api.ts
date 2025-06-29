@@ -1,5 +1,5 @@
-const API_BASE_URL = 'http://localhost:3000/api/v1';
-import { toast } from 'react-toastify';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 let forceLogoutFn: () => void = () => {};
 
