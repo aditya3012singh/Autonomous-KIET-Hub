@@ -4,6 +4,7 @@ import { BookOpen, Mail, Lock, Eye, EyeOff, User, Shield, ArrowRight, Star, Chec
 import { apiService } from '../../services/api';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from '../../contexts/AuthContext'; // ✅ Add this
 
 // Custom Logo Component matching home page
 const NoteNexusLogo = ({ className = "h-8 w-8", textSize = "text-2xl" }) => (
@@ -21,6 +22,7 @@ const NoteNexusLogo = ({ className = "h-8 w-8", textSize = "text-2xl" }) => (
 );
 
 const SignupForm: React.FC = () => {
+  const { setUser } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -36,6 +38,7 @@ const SignupForm: React.FC = () => {
   const [adminExists, setAdminExists] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const navigate = useNavigate();
+ // ✅ Add this line just after useNavigate
 
   // Cooldown timer for resend OTP
   useEffect(() => {
@@ -125,8 +128,12 @@ const SignupForm: React.FC = () => {
 
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
+      setUser(response.user);
+      toast.success("Signup successful! Redirecting...");
+      setTimeout(() => {
+        navigate('/user', { replace: true });
+      }, 800); // slight delay ensures routing after storage updates
 
-      navigate(response.user.role === 'ADMIN' ? '/admin' : '/user');
     } catch (err: any) {
       toast.error(err.message || 'Signup failed');
     } finally {

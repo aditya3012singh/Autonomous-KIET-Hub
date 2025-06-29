@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Lightbulb, Users, ArrowRight, Star, Quote, ChevronDown, Mail, Phone, MapPin, Send, Heart, Target, Award, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const quotes = [
   {
@@ -43,7 +44,7 @@ const NoteNexusLogo = ({ className = "h-8 w-8", textSize = "text-2xl" }) => (
 
 function Home() {
   const navigate = useNavigate(); // ✅ Hook to navigate
-
+  
   const handleGetStarted = () => {
     navigate('/login'); // ✅ Navigate to login page
   };
@@ -65,12 +66,34 @@ function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitted(true);
-    setTimeout(() => setIsSubmitted(false), 3000);
-    setFormData({ name: '', email: '', message: '' });
-  };
+const handleFormSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:3000/api/v1/contacts/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setIsSubmitted(true);
+      setTimeout(() => setIsSubmitted(false), 3000);
+      setFormData({ name: '', email: '', message: '' });
+      toast.success("Form Submitted successfully")
+    } else {
+      toast.error(data.error || "Something went wrong. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error submitting form:", error);
+    toast.error("Failed to send message. Please try again later.");
+  }
+};
+
 
   const features = [
     {
@@ -92,22 +115,10 @@ function Home() {
 
   const teamMembers = [
     {
-      name: "Sarah Chen",
+      name: "Aditya Singh",
       role: "Founder & CEO",
-      description: "Former educator with 15+ years in learning technology",
+      description: "Student at KIET Group Of Institution 2024-28",
       image: "https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=400"
-    },
-    {
-      name: "Marcus Rodriguez",
-      role: "Head of Product",
-      description: "UX expert passionate about intuitive learning experiences",
-      image: "https://images.pexels.com/photos/3777943/pexels-photo-3777943.jpeg?auto=compress&cs=tinysrgb&w=400"
-    },
-    {
-      name: "Dr. Emily Watson",
-      role: "Learning Scientist",
-      description: "PhD in Cognitive Science, specializing in memory and retention",
-      image: "https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=400"
     }
   ];
 
@@ -402,42 +413,38 @@ function Home() {
       </section>
 
       {/* Team Section */}
-      <section className="py-20 bg-white/70 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-800 mb-6 animate-fade-in">Meet Our Team</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto animate-slide-up">
-              Passionate educators, technologists, and learners working together to transform education.
-            </p>
-          </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {teamMembers.map((member, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 animate-slide-up"
-                style={{ animationDelay: `${index * 200}ms` }}
-              >
-                <div className="relative mb-6">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-24 h-24 rounded-full mx-auto object-cover border-4 border-gradient-to-r from-blue-500 to-purple-500 transform hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                    <Star className="h-4 w-4 text-white" />
-                  </div>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-bold text-slate-800 mb-2">{member.name}</h3>
-                  <p className="text-blue-600 font-semibold mb-3">{member.role}</p>
-                  <p className="text-slate-600 leading-relaxed">{member.description}</p>
+      <section className="py-20 bg-white/70 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold text-slate-800 mb-6 animate-fade-in">Meet the Creator</h2>
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto animate-slide-up">
+            Passion, code, and vision – all built by one.
+          </p>
+
+          <div className="mt-12 flex justify-center">
+            <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 animate-slide-up">
+              <div className="relative mb-6">
+                <img
+                  src="https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=400"
+                  alt="Profile image of Aditya Singh"
+                  className="w-28 h-28 rounded-full mx-auto object-cover border-4 border-gradient-to-r from-blue-500 to-purple-500 transform hover:scale-110 transition-transform duration-300"
+                />
+                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                  <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.012 3.11a1 1 0 00.95.69h3.263c.969 0 1.371 1.24.588 1.81l-2.64 1.918a1 1 0 00-.364 1.118l1.012 3.11c.3.921-.755 1.688-1.54 1.118l-2.64-1.918a1 1 0 00-1.176 0l-2.64 1.918c-.784.57-1.838-.197-1.539-1.118l1.011-3.11a1 1 0 00-.364-1.118L2.236 8.537c-.783-.57-.38-1.81.588-1.81h3.262a1 1 0 00.951-.69l1.012-3.11z" /></svg>
                 </div>
               </div>
-            ))}
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-slate-800 mb-2">Aditya Singh</h3>
+                <p className="text-blue-600 font-semibold mb-3">Founder & Solo Developer</p>
+                <p className="text-slate-600 leading-relaxed">
+                  Student at KIET Group Of Institutions (2024–2028), passionate about simplifying learning with technology. Every line of code, design, and idea behind NoteNexus is built by me.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
 
       {/* Story Section */}
       <section className="py-20 bg-gradient-to-r from-slate-800 via-blue-900 to-purple-900 relative overflow-hidden">
@@ -569,8 +576,8 @@ function Home() {
                     </div>
                     <div>
                       <h4 className="text-lg font-semibold text-slate-800">Email</h4>
-                      <p className="text-slate-600">hello@notenexus.com</p>
-                      <p className="text-slate-600">support@notenexus.com</p>
+                      <p className="text-slate-600">adityanotenexus@gmail.com</p>
+                      <p className="text-slate-600">supportnotenexus@gmail.com</p>
                     </div>
                   </div>
                   
@@ -580,8 +587,8 @@ function Home() {
                     </div>
                     <div>
                       <h4 className="text-lg font-semibold text-slate-800">Phone</h4>
-                      <p className="text-slate-600">+1 (555) 123-4567</p>
-                      <p className="text-slate-600">Mon-Fri, 9am-6pm EST</p>
+                      <p className="text-slate-600">+91 7905361332</p>
+                      <p className="text-slate-600">Mon-Fri, 9am-6pm IST</p>
                     </div>
                   </div>
                   
@@ -591,8 +598,8 @@ function Home() {
                     </div>
                     <div>
                       <h4 className="text-lg font-semibold text-slate-800">Office</h4>
-                      <p className="text-slate-600">123 Innovation Drive</p>
-                      <p className="text-slate-600">San Francisco, CA 94105</p>
+                      <p className="text-slate-600"></p>
+                      <p className="text-slate-600">Lucknow, Uttar Pradesh</p>
                     </div>
                   </div>
                 </div>
@@ -665,7 +672,7 @@ function Home() {
             <NoteNexusLogo className="h-8 w-8" textSize="text-2xl" />
           </button>
           <div className="text-slate-400 text-center md:text-right">
-            <p>© 2024 NoteNexus. Empowering minds, one note at a time.</p>
+            <p>© 2025 NoteNexus. Empowering minds, one note at a time.</p>
             <p className="text-sm mt-1">Crafted with ❤️ for learners everywhere</p>
           </div>
         </div>

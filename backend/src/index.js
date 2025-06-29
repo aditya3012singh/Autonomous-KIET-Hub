@@ -10,7 +10,9 @@ import feedbackRouter from "./routes/feedback.js";
 import eventRouter from "./routes/event.js";
 import announcementRouter from "./routes/announcement.js";
 import overviewRoutes from './routes/overview.js'
+import contact from './routes/contact.js'
 import activityRoutes from './routes/activity.js'
+import fileRouter from './routes/file.js'
 dotenv.config();
 
 const app = express();
@@ -23,7 +25,9 @@ app.get("/", (req, res) => {
   res.send("API running!");
 });
 app.use('/api/overview', overviewRoutes);
+app.use('/api/v1/files',fileRouter)
 app.use('/activity',activityRoutes)
+app.use('/api/v1/contacts', contact)
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/subjects", subjectRouter);
 app.use("/api/v1/notes", notesRouter);

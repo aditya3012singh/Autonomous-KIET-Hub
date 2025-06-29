@@ -164,24 +164,6 @@ const LoginForm: React.FC = () => {
               </p>
             </div>
             
-            {/* Demo Credentials */}
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/30">
-              <div className="flex items-center justify-center mb-2">
-                <Star className="h-4 w-4 text-amber-500 mr-2" />
-                <span className="text-sm font-semibold text-slate-700">Demo Credentials</span>
-              </div>
-              <div className="text-center space-y-1">
-                <p className="text-sm text-slate-600">
-                  Admin: <code className="bg-white px-2 py-1 rounded text-slate-700 font-mono text-xs border">admin@notenexus.com</code>
-                </p>
-                <p className="text-sm text-slate-600">
-                  Student: <code className="bg-white px-2 py-1 rounded text-slate-700 font-mono text-xs border">john@student.com</code>
-                </p>
-                <p className="text-sm text-slate-600">
-                  Password: <code className="bg-white px-2 py-1 rounded text-slate-700 font-mono text-xs border">password</code>
-                </p>
-              </div>
-            </div>
           </div>
         </div>
 

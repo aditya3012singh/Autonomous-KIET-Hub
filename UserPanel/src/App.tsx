@@ -1,15 +1,15 @@
-// App.tsx
+// src/App.tsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { ChatProvider } from './contexts/ChatContext'; // ✅ Add this import
+import { ChatProvider } from './contexts/ChatContext';
+import GlobalNavigate from './utils/GlobalNavigate';
 
 import LoginForm from './components/Auth/LoginForm';
 import SignupForm from './components/Auth/SignupForm';
-import ProtectedRoute from './components/ProtectedRoute';
 import UserLayout from './components/Layout/UserLayout';
 
 import UserDashboard from './pages/user/UserDashboard';
@@ -20,10 +20,13 @@ import UserAnnouncements from './pages/user/UserAnnouncements';
 import UserProfile from './pages/user/UserProfile';
 import TipDetail from './pages/user/TipDetail';
 import NoteDetail from './pages/user/NoteDetail';
-
-import Home from './pages/user/Home';
 import ChatInterface from './components/chat/ChatInterface';
+import UserFiles from './pages/user/UserFiles';
+import FileDetail from './pages/user/FileDetail';
+import Home from './pages/user/Home';
 
+
+// Component that handles conditional routing based on auth
 const AppContent: React.FC = () => {
   const { user, isLoading } = useAuth();
 
@@ -45,43 +48,42 @@ const AppContent: React.FC = () => {
       <Route path="/login" element={user ? <Navigate to="/user" replace /> : <LoginForm />} />
       <Route path="/signup" element={user ? <Navigate to="/user" replace /> : <SignupForm />} />
 
-      {/* Protected user routes */}
-      <Route
-        path="/user/*"
-        element={
-          <ProtectedRoute>
-            <UserLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<UserDashboard />} />
-        <Route path="notes" element={<UserNotes />} />
-        <Route path="notes/:id" element={<NoteDetail />} />
-        <Route path="tips" element={<UserTips />} />
-        <Route path="tips/:id" element={<TipDetail />} />
-        <Route path="events" element={<UserEvents />} />
-        <Route path="announcements" element={<UserAnnouncements />} />
-        <Route path="chat" element={<ChatInterface />} /> {/* ✅ Chat route */}
-        <Route path="profile" element={<UserProfile />} />
-      </Route>
+      {/* Protected user routes (conditionally rendered only if user exists) */}
+      {user && (
+        <Route path="/user/*" element={<UserLayout />}>
+          <Route index element={<UserDashboard />} />
+          <Route path="notes" element={<UserNotes />} />
+          <Route path="notes/:id" element={<NoteDetail />} />
+          <Route path="tips" element={<UserTips />} />
+          <Route path="tips/:id" element={<TipDetail />} />
+          <Route path="events" element={<UserEvents />} />
+          <Route path="announcements" element={<UserAnnouncements />} />
+          <Route path="chat" element={<ChatInterface />} />
+          <Route path="profile" element={<UserProfile />} />
+          <Route path="files" element={<UserFiles />} />
+          <Route path="files/:id" element={<FileDetail />} />
+        </Route>
+      )}
 
-      {/* Catch-all */}
+      {/* Fallback route */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
 
-function App() {
+
+const App: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
-        <ChatProvider> {/* ✅ Wrap with ChatProvider */}
+        <ChatProvider>
           <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+          <GlobalNavigate />
           <AppContent />
         </ChatProvider>
       </AuthProvider>
     </Router>
   );
-}
+};
 
 export default App;

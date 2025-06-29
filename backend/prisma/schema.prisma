@@ -17,12 +17,14 @@ model User {
   posts         Announcement[] @relation("UserPosts")
   feedbacks     Feedback[]     @relation("UserFeedbacks")
   files         File[]         @relation("UserFiles")
+  approvedFiles File[]         @relation("FileApprovedBy") // <-- add this line
   approvedNotes Note[]         @relation("NoteApprovedBy")
   notes         Note[]         @relation("UserNotes")
   approvedTips  Tip[]          @relation("TipApprovedBy")
   tips          Tip[]          @relation("UserTips")
   activities    Activity[]
 }
+
 
 model Activity {
   id        String   @id @default(uuid())
@@ -72,15 +74,19 @@ model Tip {
 }
 
 model File {
-  id           String   @id @default(uuid())
-  url          String
-  filename     String
-  type         String
-  size         Int
-  uploadedById String
-  createdAt    DateTime @default(now())
-  uploadedBy   User     @relation("UserFiles", fields: [uploadedById], references: [id])
+  id            String   @id @default(uuid())
+  url           String
+  filename      String
+  type          String
+  size          Int
+  uploadedById  String
+  approvedById  String?      // <-- add this line
+  createdAt     DateTime @default(now())
+
+  uploadedBy    User    @relation("UserFiles", fields: [uploadedById], references: [id])
+  approvedBy    User?   @relation("FileApprovedBy", fields: [approvedById], references: [id]) // <-- add this relation
 }
+
 
 model Feedback {
   id        String   @id @default(uuid())

@@ -200,7 +200,7 @@ const UserAnnouncements: React.FC = () => {
               </div>
               <ChevronRight className="h-5 w-5 text-slate-400" />
             </div>
-            <h3 className="text-lg font-bold text-slate-800 mb-2">Total A nnouncements</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Total Announcements</h3>
             <p className="text-3xl font-bold text-slate-600 mb-1">{announcements.length}</p>
             <p className="text-slate-600 text-sm">All time announcements</p>
           </div>

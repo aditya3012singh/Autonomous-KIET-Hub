@@ -1,5 +1,12 @@
 const API_BASE_URL = 'http://localhost:3000/api/v1';
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
+
+let forceLogoutFn: () => void = () => {};
+
+export const setForceLogout = (fn: () => void) => {
+  forceLogoutFn = fn;
+};
+
 
 class ApiService {
   
@@ -18,12 +25,10 @@ class ApiService {
   }
 
 
-  async handleResponse(response: Response) {
-    if (response.status === 401) {
-      toast.error('Session expired. Please log in again.');
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-      return; // Stop further execution
+  private async handleResponse(response: Response) {
+    if (response.status === 403) {
+      forceLogoutFn(); // will use global router now
+      return;
     }
 
     let data;
@@ -39,6 +44,7 @@ class ApiService {
 
     return data;
   }
+
 
   
   // Auth endpoints
@@ -310,6 +316,13 @@ async updateProfile(data: { name?: string; password?: string }) {
     return this.handleResponse(response);
   }
 
+  async getFile(id: string) {
+    const response = await fetch(`${API_BASE_URL}/files/file/${id}`, {
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse(response);
+  }
+
   // Feedback endpoints
   async submitFeedback(feedbackData: { content: string; noteId?: string; tipId?: string }) {
     const response = await fetch(`${API_BASE_URL}/feedback/feedback`, {
@@ -371,3 +384,5 @@ async updateProfile(data: { name?: string; password?: string }) {
 }
 
 export const apiService = new ApiService();
+
+
