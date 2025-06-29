@@ -363,7 +363,7 @@ async updateProfile(data: { name?: string; password?: string }) {
     return this.handleResponse(response);
   }
   async getRecentActivity() {
-  const response = await fetch('http://localhost:3000/api/v1/activity/recent', {
+  const response = await fetch('http://localhost:3000/activity/recent', {
     headers: this.getAuthHeaders(),
   });
   return this.handleResponse(response);

@@ -68,8 +68,6 @@ router.post("/tip/bulk", authMiddleware, async (req, res) => {
 
 router.get("/tip/all", async (req,res)=>{
     try{
-        console.log("hello");
-        
         const tips=await prisma.tip.findMany({
             where:{status:"APPROVED"},
             orderBy:{createdAt:"desc"},
@@ -88,7 +86,26 @@ router.get("/tip/all", async (req,res)=>{
         res.status(500).json({ message: "Internal server error" });
     }
 })
-
+router.get("/tip/all/pending", async (req,res)=>{
+    try{
+        const tips=await prisma.tip.findMany({
+            where:{status:"PENDING"},
+            orderBy:{createdAt:"desc"},
+            include:{
+                postedBy:{
+                    select:{id:true, name:true, email:true}
+                },
+                approvedBy:{
+                    select:{id:true, name:true}
+                }
+            }
+        })
+        res.status(200).json({ tips });
+    } catch (error) {
+        console.error("Error fetching tips:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+})
 router.put("/tip/approve/:id", authMiddleware, isAdmin, async (req,res)=>{
     try{
         const parsed=moderateTipSchema.safeParse({tipId:req.params.id, ...req.body})
@@ -228,5 +245,56 @@ router.put("/tip/approve", authMiddleware, isAdmin, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+router.put("/tip/approve/all", authMiddleware, isAdmin, async (req, res) => {
+  try {
+    const pendingTips = await prisma.tip.findMany({
+      where: { status: "PENDING" },
+      select: { id: true }
+    });
+
+    const tipIds = pendingTips.map(tip => tip.id);
+
+    const result = await prisma.tip.updateMany({
+      where: { id: { in: tipIds } },
+      data: {
+        status: "APPROVED",
+        approvedById: req.user.id
+      }
+    });
+
+    return res.status(200).json({ message: "All tips approved", count: result.count });
+  } catch (error) {
+    console.error("Error approving all tips:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// DELETE /tip/:id - Delete a tip (Admin only)
+router.delete("/tip/:id", authMiddleware, isAdmin, async (req, res) => {
+  try {
+    const tipId = req.params.id;
+
+    // Check if tip exists
+    const existingTip = await prisma.tip.findUnique({
+      where: { id: tipId },
+    });
+
+    if (!existingTip) {
+      return res.status(404).json({ message: "Tip not found" });
+    }
+
+    // Delete the tip
+    await prisma.tip.delete({
+      where: { id: tipId },
+    });
+
+    return res.status(200).json({ message: "Tip deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting tip:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 export default router;

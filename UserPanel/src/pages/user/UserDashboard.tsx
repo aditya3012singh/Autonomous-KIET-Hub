@@ -191,7 +191,7 @@ const UserDashboard: React.FC = () => {
                   <p className="text-slate-500 text-sm">Start exploring to see your activity here</p>
                 </div>
               ) : (
-                recentActivity.map((activity, index) => (
+                recentActivity.slice(0, 5).map((activity, index) => (
                   <div
                     key={index}
                     className="flex items-center space-x-4 p-4 rounded-xl hover:bg-slate-50 transition-colors duration-200 border border-slate-100"

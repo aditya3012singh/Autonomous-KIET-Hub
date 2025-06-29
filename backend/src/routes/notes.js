@@ -269,6 +269,25 @@ router.delete("/note/:id", authMiddleware, async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+// GET /note/unique-approved-count
+router.get("/unique-approved-count", authMiddleware, async (req, res) => {
+  try {
+    const uniqueFiles = await prisma.note.findMany({
+      where: {
+        approvedById: { not: null } // ✅ Approved notes
+      },
+      select: {
+        fileUrl: true,
+      },
+      distinct: ['fileUrl'], // ✅ Unique file URLs
+    });
+
+    return res.status(200).json({ count: uniqueFiles.length });
+  } catch (error) {
+    console.error("Error counting unique approved notes:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 
 
