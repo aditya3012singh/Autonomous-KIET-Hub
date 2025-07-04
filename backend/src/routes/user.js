@@ -15,7 +15,7 @@ dotenv.config();
 
 const router = express.Router();
 const prisma = new PrismaClient();
-const redis = new Redis();
+const redis = new Redis("redis://default:BDlobEnST3f4r66Gi5oJaIYK2nkUGXDE@redis-17225.crce179.ap-south-1-1.ec2.redns.redis-cloud.com:17225");
 redis.ping().then(console.log); // Should log 'PONG'
 
 
