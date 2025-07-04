@@ -7,6 +7,8 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { jwtDecode } from 'jwt-decode';
+
 
 import { AuthContextType, User } from '../types';
 import { apiService, setForceLogout } from '../services/api';
@@ -19,40 +21,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const [redirecting, setRedirecting] = useState(false);
   const navigate = useNavigate();
+  let tokenTimeout: NodeJS.Timeout;
 
-  // Setup global navigate for fallback use
+  // Setup global navigate for API fallback
   useEffect(() => {
     setGlobalNavigate(navigate);
   }, [navigate]);
 
-  // Load user from localStorage
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
-  }, []);
-
-  // ✅ Save the force logout method for API usage
+  // Force logout shared method
   const forceLogoutAndRedirect = useCallback(() => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     setRedirecting(true);
     toast.error('Session expired. Redirecting to login...');
-
     setTimeout(() => {
       navigate('/login', { replace: true });
-    }, 100); // slight delay allows proper rerender
+    }, 100);
   }, [navigate]);
 
   useEffect(() => {
     setForceLogout(forceLogoutAndRedirect);
   }, [forceLogoutAndRedirect]);
 
-  // Login handler
+  // Load user and setup token expiry auto-logout
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('token');
+
+    if (storedUser && storedToken) {
+      try {
+        const decoded: { exp: number } = jwtDecode(storedToken);
+        const expiryTime = decoded.exp * 1000; // convert to ms
+        const currentTime = Date.now();
+
+        if (currentTime >= expiryTime) {
+          forceLogoutAndRedirect();
+        } else {
+          const timeLeft = expiryTime - currentTime;
+
+          tokenTimeout = setTimeout(() => {
+            forceLogoutAndRedirect();
+          }, timeLeft);
+
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (err) {
+        console.error("Invalid token:", err);
+        forceLogoutAndRedirect();
+      }
+    }
+
+    setIsLoading(false);
+
+    // Cleanup timer on unmount
+    return () => clearTimeout(tokenTimeout);
+  }, [forceLogoutAndRedirect]);
+
+  // Manual login
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
@@ -84,7 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Logout manually
+  // Manual logout
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
