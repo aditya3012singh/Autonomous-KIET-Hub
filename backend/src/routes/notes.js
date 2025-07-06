@@ -188,6 +188,30 @@ router.post('/bulk-approve', authMiddleware, isAdmin, async (req, res) => {
   }
 });
 
+router.post('/bulk-delete', authMiddleware, isAdmin, async (req, res) => {
+  try {
+    const { noteIds } = req.body;
+
+    if (!Array.isArray(noteIds) || noteIds.length === 0) {
+      return res.status(400).json({ message: 'noteIds must be a non-empty array.' });
+    }
+
+    const result = await prisma.note.deleteMany({
+      where: {
+        id: { in: noteIds },
+      },
+    });
+
+    return res.status(200).json({
+      message: `${result.count} notes deleted.`,
+    });
+  } catch (error) {
+    console.error('Bulk delete error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 // GET /note/filter?branch=IT&semester=4&subjectId=abc-uuid
 router.get("/note/filter", async (req, res) => {
   const { branch, semester, subjectId } = req.query;
